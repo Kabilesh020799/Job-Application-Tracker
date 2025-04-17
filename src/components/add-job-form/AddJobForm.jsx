@@ -34,7 +34,7 @@ const AddJobForm = ({ open, onClose, onSubmit }) => {
         formDataFile.append("resume", resumeFile);
 
         const uploadRes = await fetch(
-          "http://localhost:3001/api/upload-resume",
+          "https://job-application-tracker-zkoo.onrender.com/api/upload-resume",
           {
             method: "POST",
             body: formDataFile,

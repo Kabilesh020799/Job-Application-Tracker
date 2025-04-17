@@ -14,7 +14,7 @@ const SheetTableContainer = () => {
 
   const fetchData = () => {
     setLoading(true);
-    fetch("http://localhost:3001/api/rows")
+    fetch("https://job-application-tracker-zkoo.onrender.com/api/rows")
       .then((res) => res.json())
       .then((data) => {
         const sheetRows = data.rows || [];
@@ -49,7 +49,7 @@ const SheetTableContainer = () => {
   }, [searchTerm, rows]);
 
   const handleSubmit = (rowData) => {
-    fetch("http://localhost:3001/api/submit", {
+    fetch("https://job-application-tracker-zkoo.onrender.com/api/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ rowData }),
