@@ -1,4 +1,3 @@
-// containers/SheetTableContainer.jsx
 import React, { useEffect, useState } from "react";
 import SheetTable from "../../components/sheet-table";
 import AddJobForm from "../../components/add-job-form";
@@ -39,7 +38,7 @@ const SheetTableContainer = () => {
     } else {
       const term = searchTerm.toLowerCase();
       const filtered = rows.filter((row, index) => {
-        if (index === 0) return true; // keep header row
+        if (index === 0) return true;
         return row.some(
           (cell) =>
             typeof cell === "string" && cell.toLowerCase().includes(term)
