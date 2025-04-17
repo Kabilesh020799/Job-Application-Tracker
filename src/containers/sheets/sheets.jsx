@@ -1,15 +1,18 @@
 // containers/SheetTableContainer.jsx
 import React, { useEffect, useState } from "react";
 import SheetTable from "../../components/sheet-table";
+import AddJobForm from "../../components/add-job-form";
 import { CircularProgress, Box } from "@mui/material";
 
 const SheetTableContainer = () => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false); // modal state
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  useEffect(() => {
+  const fetchData = () => {
+    setLoading(true);
     fetch("http://localhost:3001/api/rows")
       .then((res) => res.json())
       .then((data) => {
@@ -20,15 +23,20 @@ const SheetTableContainer = () => {
         console.error("Error fetching sheet data:", err);
         setLoading(false);
       });
-  }, []);
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleSubmit = (rowData) => {
+    fetch("http://localhost:3001/api/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ rowData }),
+    })
+      .then(() => fetchData())
+      .catch(console.error);
   };
 
   if (loading) {
@@ -45,13 +53,26 @@ const SheetTableContainer = () => {
   }
 
   return (
-    <SheetTable
-      rows={rows}
-      page={page}
-      rowsPerPage={rowsPerPage}
-      handleChangePage={handleChangePage}
-      handleChangeRowsPerPage={handleChangeRowsPerPage}
-    />
+    <Box>
+      <SheetTable
+        rows={rows}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        handleChangePage={(e, newPage) => setPage(newPage)}
+        handleChangeRowsPerPage={(e) => {
+          setRowsPerPage(parseInt(e.target.value, 10));
+          setPage(0);
+        }}
+        onNewJob={() => setOpen(true)}
+      />
+
+      {/* Modal form */}
+      <AddJobForm
+        open={open}
+        onClose={() => setOpen(false)}
+        onSubmit={handleSubmit}
+      />
+    </Box>
   );
 };
 

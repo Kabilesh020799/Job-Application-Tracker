@@ -9,6 +9,8 @@ import {
   Paper,
   Typography,
   TablePagination,
+  Button,
+  Box,
 } from "@mui/material";
 
 const SheetTable = ({
@@ -17,6 +19,7 @@ const SheetTable = ({
   rowsPerPage,
   handleChangePage,
   handleChangeRowsPerPage,
+  onNewJob,
 }) => {
   const [expandedCells, setExpandedCells] = useState({});
 
@@ -51,9 +54,20 @@ const SheetTable = ({
       elevation={3}
       sx={{ width: "100vw", height: "100vh", overflow: "auto" }}
     >
-      <Typography variant="h6" sx={{ p: 2 }}>
-        Google Sheet Data
-      </Typography>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems={"center"}
+        mt={2}
+        mr={4}
+      >
+        <Typography variant="h6" sx={{ p: 2 }}>
+          Google Sheet Data
+        </Typography>
+        <Button variant="contained" onClick={onNewJob}>
+          Add New Job
+        </Button>
+      </Box>
       <Table stickyHeader>
         <TableHead>
           <TableRow>
