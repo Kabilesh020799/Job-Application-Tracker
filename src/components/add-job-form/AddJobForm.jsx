@@ -18,28 +18,56 @@ const AddJobForm = ({ open, onClose, onSubmit }) => {
     date: "",
   });
 
+  const [resumeFile, setResumeFile] = useState(null);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
-    const row = [
-      formData.position,
-      formData.company,
-      formData.link,
-      formData.description,
-      formData.date,
-    ];
-    onSubmit(row);
-    setFormData({
-      position: "",
-      company: "",
-      link: "",
-      description: "",
-      date: "",
-    });
-    onClose();
+  const handleSubmit = async () => {
+    try {
+      let resumeUrl = "";
+
+      if (resumeFile) {
+        const formDataFile = new FormData();
+        formDataFile.append("resume", resumeFile);
+
+        const uploadRes = await fetch(
+          "http://localhost:3001/api/upload-resume",
+          {
+            method: "POST",
+            body: formDataFile,
+          }
+        );
+
+        const uploadData = await uploadRes.json();
+        resumeUrl = uploadData.url;
+      }
+
+      const row = [
+        formData.position,
+        formData.company,
+        formData.link,
+        formData.description,
+        formData.date,
+        resumeUrl,
+      ];
+
+      await onSubmit(row);
+
+      setFormData({
+        position: "",
+        company: "",
+        link: "",
+        description: "",
+        date: "",
+      });
+      setResumeFile(null);
+      onClose();
+    } catch (error) {
+      console.error("Submission failed:", error);
+    }
   };
 
   return (
@@ -83,6 +111,11 @@ const AddJobForm = ({ open, onClose, onSubmit }) => {
             value={formData.date}
             onChange={handleChange}
             fullWidth
+          />
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={(e) => setResumeFile(e.target.files[0])}
           />
         </Box>
       </DialogContent>
