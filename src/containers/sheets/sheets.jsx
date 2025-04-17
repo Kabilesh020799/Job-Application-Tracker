@@ -2,21 +2,25 @@
 import React, { useEffect, useState } from "react";
 import SheetTable from "../../components/sheet-table";
 import AddJobForm from "../../components/add-job-form";
-import { CircularProgress, Box } from "@mui/material";
+import { CircularProgress, Box, TextField } from "@mui/material";
 
 const SheetTableContainer = () => {
   const [rows, setRows] = useState([]);
+  const [filteredRows, setFilteredRows] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false); // modal state
+  const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchData = () => {
     setLoading(true);
     fetch("https://job-application-tracker-zkoo.onrender.com/api/rows")
       .then((res) => res.json())
       .then((data) => {
-        setRows(data.rows || []);
+        const sheetRows = data.rows || [];
+        setRows(sheetRows);
+        setFilteredRows(sheetRows);
         setLoading(false);
       })
       .catch((err) => {
@@ -28,6 +32,22 @@ const SheetTableContainer = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredRows(rows);
+    } else {
+      const term = searchTerm.toLowerCase();
+      const filtered = rows.filter((row, index) => {
+        if (index === 0) return true; // keep header row
+        return row.some(
+          (cell) =>
+            typeof cell === "string" && cell.toLowerCase().includes(term)
+        );
+      });
+      setFilteredRows(filtered);
+    }
+  }, [searchTerm, rows]);
 
   const handleSubmit = (rowData) => {
     fetch("https://job-application-tracker-zkoo.onrender.com/api/submit", {
@@ -55,7 +75,7 @@ const SheetTableContainer = () => {
   return (
     <Box>
       <SheetTable
-        rows={rows}
+        rows={filteredRows}
         page={page}
         rowsPerPage={rowsPerPage}
         handleChangePage={(e, newPage) => setPage(newPage)}
@@ -64,9 +84,10 @@ const SheetTableContainer = () => {
           setPage(0);
         }}
         onNewJob={() => setOpen(true)}
+        searchTerm={searchTerm}
+        onSearch={(e) => setSearchTerm(e.target.value)}
       />
 
-      {/* Modal form */}
       <AddJobForm
         open={open}
         onClose={() => setOpen(false)}

@@ -11,6 +11,7 @@ import {
   TablePagination,
   Button,
   Box,
+  TextField,
 } from "@mui/material";
 
 const SheetTable = ({
@@ -20,6 +21,8 @@ const SheetTable = ({
   handleChangePage,
   handleChangeRowsPerPage,
   onNewJob,
+  onSearch,
+  searchTerm,
 }) => {
   const [expandedCells, setExpandedCells] = useState({});
 
@@ -64,9 +67,19 @@ const SheetTable = ({
         <Typography variant="h6" sx={{ p: 2 }}>
           Google Sheet Data
         </Typography>
-        <Button variant="contained" onClick={onNewJob}>
-          Add New Job
-        </Button>
+        <Box display="flex" justifyContent="flex-end" gap={2}>
+          <TextField
+            label="Search Jobs"
+            variant="outlined"
+            size="small"
+            value={searchTerm}
+            onChange={onSearch}
+            sx={{ width: 300 }}
+          />
+          <Button variant="contained" onClick={onNewJob}>
+            Add New Job
+          </Button>
+        </Box>
       </Box>
       <Table stickyHeader>
         <TableHead>
