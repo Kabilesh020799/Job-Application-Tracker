@@ -57,16 +57,6 @@ const SheetTable = ({
       <Table stickyHeader>
         <TableHead>
           <TableRow>
-            <TableCell
-              sx={{
-                fontWeight: "bold",
-                border: "1px solid #ccc",
-                backgroundColor: "#f5f5f5",
-                minWidth: "80px",
-              }}
-            >
-              S.No
-            </TableCell>
             {headers.map((head, index) => (
               <TableCell
                 key={index}
@@ -86,9 +76,6 @@ const SheetTable = ({
         <TableBody>
           {paginatedRows.map((row, rowIndex) => (
             <TableRow key={rowIndex}>
-              <TableCell sx={{ border: "1px solid #ddd", fontWeight: 500 }}>
-                {page * rowsPerPage + rowIndex + 1}
-              </TableCell>
               {row.map((cell, colIndex) => {
                 const key = `${rowIndex + page * rowsPerPage}-${colIndex}`;
                 const isExpanded = expandedCells[key];

@@ -32,7 +32,15 @@ async function getAllRows() {
     range: RANGE,
   });
 
-  return response.data.values;
+  let values = response.data.values || [];
+
+  const [header, ...dataRows] = values;
+  const reversed = dataRows.reverse();
+
+  const indexedRows = reversed.map((row, i) => [i + 1, ...row]);
+  const updatedHeader = ["S.No", ...header];
+
+  return [updatedHeader, ...indexedRows];
 }
 
 module.exports = { appendRowToSheet, getAllRows };
