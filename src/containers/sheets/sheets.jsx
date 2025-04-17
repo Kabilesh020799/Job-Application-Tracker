@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from "react";
 import SheetTable from "../../components/sheet-table";
 import AddJobForm from "../../components/add-job-form";
-import { CircularProgress, Box, TextField } from "@mui/material";
+import {
+  CircularProgress,
+  Box,
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+} from "@mui/material";
 
 const SheetTableContainer = () => {
   const [rows, setRows] = useState([]);
@@ -11,6 +20,12 @@ const SheetTableContainer = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [error, setError] = useState("");
+
+  const PASSWORD = import.meta.env.VITE_SECRET_KEY;
 
   const fetchData = () => {
     setLoading(true);
@@ -29,8 +44,10 @@ const SheetTableContainer = () => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (isAuthenticated) {
+      fetchData();
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!searchTerm.trim()) {
@@ -57,6 +74,39 @@ const SheetTableContainer = () => {
       .then(() => fetchData())
       .catch(console.error);
   };
+
+  const handleUnlock = () => {
+    if (passwordInput === PASSWORD) {
+      setIsAuthenticated(true);
+      setError("");
+    } else {
+      setError("Incorrect password");
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <Dialog open fullWidth maxWidth="xs">
+        <DialogTitle>Password Required</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Enter Password"
+            type="password"
+            value={passwordInput}
+            onChange={(e) => setPasswordInput(e.target.value)}
+            fullWidth
+            error={!!error}
+            helperText={error}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleUnlock} variant="contained">
+            Unlock
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
 
   if (loading) {
     return (
