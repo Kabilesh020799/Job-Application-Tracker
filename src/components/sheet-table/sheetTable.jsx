@@ -106,48 +106,81 @@ const SheetTable = ({
               {row.map((cell, colIndex) => {
                 const key = `${rowIndex + page * rowsPerPage}-${colIndex}`;
                 const isExpanded = expandedCells[key];
-                const isLong = typeof cell === "string" && cell.length > 200;
-
+                const isLong = typeof cell === "string" && cell.length > 30;
                 return (
                   <TableCell
                     key={colIndex}
-                    sx={{ border: "1px solid #ddd", minWidth: "200px" }}
+                    sx={{
+                      border: "1px solid #ddd",
+                      width:
+                        colIndex === 0
+                          ? "80px"
+                          : `${
+                              (100 - (80 / window.innerWidth) * 100) /
+                              (headers.length - 1)
+                            }%`,
+                      maxWidth: colIndex === 0 ? "80px" : "200px",
+                      whiteSpace: isExpanded ? "normal" : "nowrap",
+                      overflow: isExpanded ? "visible" : "hidden",
+                      textOverflow: isExpanded ? "unset" : "ellipsis",
+                      cursor: isLong ? "pointer" : "default",
+                    }}
                   >
-                    {isExpanded || !isLong ? (
-                      cell
+                    {isExpanded ? (
+                      <>
+                        <Box
+                          sx={{ whiteSpace: "normal", wordWrap: "break-word" }}
+                        >
+                          {cell}
+                        </Box>
+                        {isLong && (
+                          <div
+                            onClick={() =>
+                              toggleExpand(
+                                rowIndex + page * rowsPerPage,
+                                colIndex
+                              )
+                            }
+                            style={{
+                              color: "blue",
+                              cursor: "pointer",
+                              marginTop: 4,
+                            }}
+                          >
+                            Show less
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <>
-                        {cell.slice(0, 200)}...
-                        <span
-                          onClick={() =>
-                            toggleExpand(
-                              rowIndex + page * rowsPerPage,
-                              colIndex
-                            )
-                          }
-                          style={{
-                            color: "blue",
-                            cursor: "pointer",
-                            marginLeft: 8,
+                        <Box
+                          sx={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            display: "block",
                           }}
                         >
-                          Read more
-                        </span>
+                          {cell}
+                        </Box>
+                        {isLong && (
+                          <span
+                            onClick={() =>
+                              toggleExpand(
+                                rowIndex + page * rowsPerPage,
+                                colIndex
+                              )
+                            }
+                            style={{
+                              color: "blue",
+                              cursor: "pointer",
+                              marginLeft: 8,
+                            }}
+                          >
+                            Read more
+                          </span>
+                        )}
                       </>
-                    )}
-                    {isExpanded && isLong && (
-                      <div
-                        onClick={() =>
-                          toggleExpand(rowIndex + page * rowsPerPage, colIndex)
-                        }
-                        style={{
-                          color: "blue",
-                          cursor: "pointer",
-                          marginTop: 4,
-                        }}
-                      >
-                        Show less
-                      </div>
                     )}
                   </TableCell>
                 );
