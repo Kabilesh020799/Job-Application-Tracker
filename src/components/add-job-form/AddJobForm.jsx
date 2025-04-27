@@ -16,7 +16,7 @@ const AddJobForm = ({ open, onClose, onSubmit }) => {
     company: "",
     link: "",
     description: "",
-    date: "",
+    date: new Date().toISOString().split("T")[0],
   });
 
   const [resumeFile, setResumeFile] = useState(null);
