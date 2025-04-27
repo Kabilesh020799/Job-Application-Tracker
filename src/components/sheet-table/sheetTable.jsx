@@ -27,7 +27,18 @@ const SheetTable = ({
   const [expandedCells, setExpandedCells] = useState({});
 
   if (!rows || rows.length === 0) {
-    return <Typography>No data available</Typography>;
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
+        <Typography variant="h5" color="textSecondary">
+          No data available
+        </Typography>
+      </Box>
+    );
   }
 
   const headers = rows[0];
@@ -52,153 +63,195 @@ const SheetTable = ({
   };
 
   return (
-    <TableContainer
-      component={Paper}
-      elevation={3}
-      sx={{ width: "100vw", height: "100vh", overflow: "auto" }}
+    <Box
+      sx={{
+        width: "100vw",
+        height: "100vh",
+        overflow: "hidden",
+        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+        padding: 2,
+        boxSizing: "border-box",
+      }}
     >
       <Box
         display="flex"
         justifyContent="space-between"
-        alignItems={"center"}
-        mt={2}
-        mr={4}
+        alignItems="center"
+        mb={2}
+        px={2}
       >
-        <Typography variant="h6" sx={{ p: 2 }}>
-          Google Sheet Data
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: "bold",
+            color: "#2e3b55",
+          }}
+        >
+          Job Listings
         </Typography>
-        <Box display="flex" justifyContent="flex-end" gap={2}>
+        <Box display="flex" gap={2}>
           <TextField
             label="Search Jobs"
             variant="outlined"
             size="small"
             value={searchTerm}
             onChange={onSearch}
-            sx={{ width: 300 }}
+            sx={{ backgroundColor: "white", borderRadius: 1 }}
           />
-          <Button variant="contained" onClick={onNewJob}>
+          <Button variant="contained" color="primary" onClick={onNewJob}>
             Add New Job
           </Button>
         </Box>
       </Box>
-      <Table stickyHeader>
-        <TableHead>
-          <TableRow>
-            {headers.map((head, index) => (
-              <TableCell
-                key={index}
+
+      <TableContainer
+        component={Paper}
+        elevation={6}
+        sx={{
+          height: "calc(100vh - 100px)",
+          overflow: "auto",
+          borderRadius: 3,
+        }}
+      >
+        <Table stickyHeader>
+          <TableHead>
+            <TableRow>
+              {headers.map((head, index) => (
+                <TableCell
+                  key={index}
+                  sx={{
+                    backgroundColor: "#1976d2",
+                    color: "white",
+                    fontWeight: "bold",
+                    textAlign: index === 0 ? "center" : "left",
+                    minWidth: index === 0 ? "80px" : "150px",
+                    fontSize: "16px",
+                    borderRight: "1px solid #ddd",
+                  }}
+                >
+                  {head}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {paginatedRows.map((row, rowIndex) => (
+              <TableRow
+                key={rowIndex}
                 sx={{
-                  fontWeight: "bold",
-                  border: "1px solid #ccc",
-                  backgroundColor: "#f5f5f5",
-                  minWidth: "150px",
+                  backgroundColor: rowIndex % 2 === 0 ? "#f9fafc" : "white",
+                  "&:hover": {
+                    backgroundColor: "#e3f2fd",
+                  },
                 }}
               >
-                {head}
-              </TableCell>
+                {row.map((cell, colIndex) => {
+                  const key = `${rowIndex + page * rowsPerPage}-${colIndex}`;
+                  const isExpanded = expandedCells[key];
+                  const isLong = typeof cell === "string" && cell.length > 30;
+                  return (
+                    <TableCell
+                      key={colIndex}
+                      sx={{
+                        width:
+                          colIndex === 0
+                            ? "80px"
+                            : `${
+                                (100 - (80 / window.innerWidth) * 100) /
+                                (headers.length - 1)
+                              }%`,
+                        maxWidth: colIndex === 0 ? "80px" : "200px",
+                        whiteSpace: isExpanded ? "normal" : "nowrap",
+                        overflow: isExpanded ? "visible" : "hidden",
+                        textOverflow: isExpanded ? "unset" : "ellipsis",
+                        textAlign: colIndex === 0 ? "center" : "left",
+                        fontSize: "14px",
+                        padding: "10px",
+                      }}
+                    >
+                      {isExpanded ? (
+                        <>
+                          <Box
+                            sx={{
+                              whiteSpace: "normal",
+                              wordWrap: "break-word",
+                            }}
+                          >
+                            {cell}
+                          </Box>
+                          {isLong && (
+                            <div
+                              onClick={() =>
+                                toggleExpand(
+                                  rowIndex + page * rowsPerPage,
+                                  colIndex
+                                )
+                              }
+                              style={{
+                                color: "#1976d2",
+                                cursor: "pointer",
+                                fontSize: "12px",
+                                marginTop: 4,
+                                textDecoration: "underline",
+                              }}
+                            >
+                              Show less
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <Box
+                            sx={{
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              display: "block",
+                            }}
+                          >
+                            {cell}
+                          </Box>
+                          {isLong && (
+                            <span
+                              onClick={() =>
+                                toggleExpand(
+                                  rowIndex + page * rowsPerPage,
+                                  colIndex
+                                )
+                              }
+                              style={{
+                                color: "#1976d2",
+                                cursor: "pointer",
+                                marginLeft: 8,
+                                fontSize: "12px",
+                                textDecoration: "underline",
+                              }}
+                            >
+                              Read more
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </TableCell>
+                  );
+                })}
+              </TableRow>
             ))}
-          </TableRow>
-        </TableHead>
+          </TableBody>
+        </Table>
 
-        <TableBody>
-          {paginatedRows.map((row, rowIndex) => (
-            <TableRow key={rowIndex}>
-              {row.map((cell, colIndex) => {
-                const key = `${rowIndex + page * rowsPerPage}-${colIndex}`;
-                const isExpanded = expandedCells[key];
-                const isLong = typeof cell === "string" && cell.length > 30;
-                return (
-                  <TableCell
-                    key={colIndex}
-                    sx={{
-                      border: "1px solid #ddd",
-                      width:
-                        colIndex === 0
-                          ? "80px"
-                          : `${
-                              (100 - (80 / window.innerWidth) * 100) /
-                              (headers.length - 1)
-                            }%`,
-                      maxWidth: colIndex === 0 ? "80px" : "200px",
-                      whiteSpace: isExpanded ? "normal" : "nowrap",
-                      overflow: isExpanded ? "visible" : "hidden",
-                      textOverflow: isExpanded ? "unset" : "ellipsis",
-                      cursor: isLong ? "pointer" : "default",
-                    }}
-                  >
-                    {isExpanded ? (
-                      <>
-                        <Box
-                          sx={{ whiteSpace: "normal", wordWrap: "break-word" }}
-                        >
-                          {cell}
-                        </Box>
-                        {isLong && (
-                          <div
-                            onClick={() =>
-                              toggleExpand(
-                                rowIndex + page * rowsPerPage,
-                                colIndex
-                              )
-                            }
-                            style={{
-                              color: "blue",
-                              cursor: "pointer",
-                              marginTop: 4,
-                            }}
-                          >
-                            Show less
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <Box
-                          sx={{
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            display: "block",
-                          }}
-                        >
-                          {cell}
-                        </Box>
-                        {isLong && (
-                          <span
-                            onClick={() =>
-                              toggleExpand(
-                                rowIndex + page * rowsPerPage,
-                                colIndex
-                              )
-                            }
-                            style={{
-                              color: "blue",
-                              cursor: "pointer",
-                              marginLeft: 8,
-                            }}
-                          >
-                            Read more
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </TableCell>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25, 50]}
-        component="div"
-        count={dataRows.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
-    </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25, 50]}
+          component="div"
+          count={dataRows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </TableContainer>
+    </Box>
   );
 };
 
