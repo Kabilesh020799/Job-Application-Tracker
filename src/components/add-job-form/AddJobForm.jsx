@@ -7,6 +7,7 @@ import {
   DialogActions,
   TextField,
   Box,
+  Typography,
 } from "@mui/material";
 
 const AddJobForm = ({ open, onClose, onSubmit }) => {
@@ -71,16 +72,40 @@ const AddJobForm = ({ open, onClose, onSubmit }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Add New Job</DialogTitle>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="sm"
+      fullWidth
+      PaperProps={{
+        sx: {
+          borderRadius: 4,
+          background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+          p: 2,
+        },
+      }}
+    >
+      <DialogTitle
+        sx={{
+          fontWeight: "bold",
+          fontSize: "24px",
+          textAlign: "center",
+          color: "#2e3b55",
+        }}
+      >
+        Add New Job
+      </DialogTitle>
+
       <DialogContent>
-        <Box mt={2} display="flex" flexDirection="column" gap={2}>
+        <Box mt={2} display="flex" flexDirection="column" gap={3}>
           <TextField
             name="position"
             label="Position"
             value={formData.position}
             onChange={handleChange}
             fullWidth
+            variant="outlined"
+            sx={{ backgroundColor: "white", borderRadius: 2 }}
           />
           <TextField
             name="company"
@@ -88,6 +113,8 @@ const AddJobForm = ({ open, onClose, onSubmit }) => {
             value={formData.company}
             onChange={handleChange}
             fullWidth
+            variant="outlined"
+            sx={{ backgroundColor: "white", borderRadius: 2 }}
           />
           <TextField
             name="link"
@@ -95,6 +122,8 @@ const AddJobForm = ({ open, onClose, onSubmit }) => {
             value={formData.link}
             onChange={handleChange}
             fullWidth
+            variant="outlined"
+            sx={{ backgroundColor: "white", borderRadius: 2 }}
           />
           <TextField
             name="description"
@@ -103,27 +132,76 @@ const AddJobForm = ({ open, onClose, onSubmit }) => {
             onChange={handleChange}
             fullWidth
             multiline
-            minRows={3}
+            minRows={4}
+            variant="outlined"
+            sx={{ backgroundColor: "white", borderRadius: 2 }}
           />
           <TextField
             name="date"
             label="Date"
+            type="date"
             value={formData.date}
             onChange={handleChange}
             fullWidth
+            variant="outlined"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            sx={{ backgroundColor: "white", borderRadius: 2 }}
           />
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={(e) => setResumeFile(e.target.files[0])}
-          />
+
+          <Box display="flex" flexDirection="column" gap={1} mt={2}>
+            <Typography
+              sx={{ fontWeight: "bold", color: "#2e3b55", fontSize: "16px" }}
+            >
+              Upload Resume (PDF)
+            </Typography>
+            <Button
+              component="label"
+              variant="outlined"
+              color="primary"
+              sx={{
+                borderRadius: 2,
+                textTransform: "none",
+                fontWeight: "bold",
+                backgroundColor: "white",
+              }}
+            >
+              Choose File
+              <input
+                type="file"
+                accept=".pdf"
+                hidden
+                onChange={(e) => setResumeFile(e.target.files[0])}
+              />
+            </Button>
+            {resumeFile && (
+              <Typography
+                variant="body2"
+                sx={{ color: "#555", fontStyle: "italic", mt: 1 }}
+              >
+                {resumeFile.name}
+              </Typography>
+            )}
+          </Box>
         </Box>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} variant="outlined">
+
+      <DialogActions sx={{ justifyContent: "center", mt: 2 }}>
+        <Button
+          onClick={onClose}
+          variant="outlined"
+          color="secondary"
+          sx={{ borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
+        >
           Cancel
         </Button>
-        <Button onClick={handleSubmit} variant="contained">
+        <Button
+          onClick={handleSubmit}
+          variant="contained"
+          color="primary"
+          sx={{ borderRadius: 2, textTransform: "none", fontWeight: "bold" }}
+        >
           Submit
         </Button>
       </DialogActions>
