@@ -97,6 +97,11 @@ const SheetTableContainer = () => {
             fullWidth
             error={!!error}
             helperText={error}
+            onKeyUp={(e) => {
+              if (e.key === "Enter") {
+                handleUnlock();
+              }
+            }}
           />
         </DialogContent>
         <DialogActions>
